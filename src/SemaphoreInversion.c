@@ -19,6 +19,8 @@
 #define MEDIUM_TASK_PRIORITY      ( tskIDLE_PRIORITY + 2UL )
 #define HIGH_TASK_PRIORITY      ( tskIDLE_PRIORITY + 3UL )
 
+char statsBuffer[500] = {0};
+
 SemaphoreHandle_t semaphore;
 
 void low_task(__unused void *params)
@@ -103,6 +105,12 @@ void supervisor_task(__unused void *params) {
     vTaskDelay(pdMS_TO_TICKS(100));
     xTaskCreate(high_task, "HighThread",
                 TASK_STACK_SIZE, NULL, HIGH_TASK_PRIORITY, NULL);   
+
+    vTaskDelay(pdMS_TO_TICKS(5000));
+
+    vTaskGetRunTimeStats(statsBuffer);
+    printf("\nTask Name\tAbs Time (us)\tPercent Time\n");
+    printf("%s", statsBuffer);
 
     // Supervisor no longer needed; delete to prevent interference with other tasks
     vTaskDelete(NULL);
